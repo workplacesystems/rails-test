@@ -41,3 +41,7 @@ gem 'spring',        group: :development
 group :development, :test do
   gem 'rspec-rails', '~> 3.0.2'
 end
+
+group :test do
+  gem 'coveralls', require: false
+end
