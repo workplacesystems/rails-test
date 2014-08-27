@@ -36,12 +36,6 @@ This Rails application is a foundation for the following Ruby on Rails technical
 * The creation API endpoint should be able to receive both a singular resource hash and an array of multiple resource hashes.
 * Data should be stored in in it's appropriate format but presented in the fashion demonstrated above.
 
-### Acceptance Criteria
-
-* Users can upload sample CSV file (/spec/data/point-of-sale-data.csv).
-* The data is saved to a database
-* The sales in the upload file can be viewed in a browser
-
 ## Caveats & Rules
 
 ### Time Constraint
