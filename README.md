@@ -4,7 +4,7 @@ This Rails application is a foundation for the following Ruby on Rails technical
 
 ## Tasks
 
-1. Create an API endpoint that receives the following format `params` hash and creates the resources:
+* Create an API endpoint that receives the following format `params` hash and creates the resources:
 
 ```ruby
 {
@@ -25,9 +25,9 @@ This Rails application is a foundation for the following Ruby on Rails technical
 }
 ```
 
-2. Create a JSON API endpoint for reading all persisted sales.
-3. Create a JSON API endpoint for reading a specific sale.
-4. Create a JSON API endpoint for destroying a specific sale.
+* Create a JSON API endpoint for reading a specific sale.
+* Create a JSON API endpoint for destroying a specific sale.
+* Implement password security for sales during their creation that must then be used to retrieve that sale.
 
 ### Notes
 
