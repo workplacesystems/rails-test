@@ -35,6 +35,7 @@ This Rails application is a foundation for the following Ruby on Rails technical
 
 * The creation API endpoint should be able to receive both a singular resource hash and an array of multiple resource hashes.
 * Data should be stored in in it's appropriate format but presented in the fashion demonstrated above.
+* Please implement password security manually - do not use `has_secure_password`.
 
 ## Caveats & Rules
 
