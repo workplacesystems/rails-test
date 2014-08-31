@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140831060602) do
+ActiveRecord::Schema.define(version: 20140831155330) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -19,9 +19,12 @@ ActiveRecord::Schema.define(version: 20140831060602) do
   create_table "sales", force: true do |t|
     t.datetime "date"
     t.string   "code"
-    t.decimal  "value",      precision: 8, scale: 2
+    t.decimal  "value",           precision: 8, scale: 2
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "hashed_password"
   end
+
+  add_index "sales", ["hashed_password"], name: "index_sales_on_hashed_password", using: :btree
 
 end
