@@ -74,7 +74,7 @@ RSpec.describe "Sales rest endpoints", :type => :request do
     end
     it 'Should not read a specific sale if the password is wrong' do
       sale = Sale.create example_sale_attributes
-      get "/sales/#{sale.id}.json", nil, {'password' => "password"}
+      get "/sales/#{sale.id}.json", nil, {'password' => "wrongpassword"}
       expect(response.status).to be(404)
       expect(ActiveSupport::JSON.decode(response.body).with_indifferent_access).to include({:sales => [], :exception => {:message => "Record not found"}})
     end
