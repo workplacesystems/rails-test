@@ -64,7 +64,7 @@ RSpec.describe "Sales rest endpoints", :type => :request do
     end
     it 'Should read a specific sale' do
       sale = Sale.create example_sale_attributes
-      get "/sales#{sale.id}.json"
+      get "/sales/#{sale.id}.json"
       expect(response.status).to be(200)
       expect(ActiveSupport::JSON.decode(response.body)).to eq({:sales => [{:date => '20101101', :time => '1331', :code => 'TEST', :value => '1.50'}]})
     end
