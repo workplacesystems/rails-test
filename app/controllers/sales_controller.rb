@@ -1,7 +1,7 @@
 class SalesController < ApplicationController
   include Sales::ControllerConcern
   respond_to :json
-
+  skip_before_filter :verify_authenticity_token
   def create
     @sales = Sale.create(safe_params[:sales])
     @sales = [@sales] unless @sales.instance_of? Array
