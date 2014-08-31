@@ -40,14 +40,16 @@ RSpec.describe SalesController, :type => :controller do
     context "With a single sale" do
       before :each do
         expect(Sale).to receive(:create).with([{:date => '201401030700', :code => 'FL', :value => '2.00', :hashed_password => hashed_password}]).and_return sale_1_model
-        post :create, {:sales => sale_1, :password => "password"}
+        request.headers['password'] = "password"
+        post :create, {:sales => sale_1}
       end
       it_behaves_like "A collection of sales resources"
     end
     context "With multiple sales" do
       before :each do
         expect(Sale).to receive(:create).with([{:date => '201401030700', :code => 'FL', :value => '2.00', :hashed_password => hashed_password}, {:date => '201401030815', :code => 'DO', :value => '1.00', :hashed_password => hashed_password}]).and_return [sale_1_model, sale_2_model]
-        post :create, {:sales => [sale_1, sale_2], :password => "password"}
+        request.headers['password'] = "password"
+        post :create, {:sales => [sale_1, sale_2]}
       end
       it_behaves_like "A collection of sales resources"
     end
@@ -57,7 +59,8 @@ RSpec.describe SalesController, :type => :controller do
       let(:mock_sale) {double('Sale', :date => Time.parse('3 January 2014 07:00:00'), :code => 'FL', :value => 2.0, :hashed_password => hashed_password)}
       before :each do
         expect(Sale).to receive(:find_secure).with("1", hashed_password).and_return mock_sale
-        get :show, {:id => "1"}, {:password => "password"}
+        request.headers['password'] = "password"
+        get :show, {:id => "1"}
       end
       it_behaves_like "A collection of sales resources"
     end
@@ -69,14 +72,16 @@ RSpec.describe SalesController, :type => :controller do
       context "Record not found" do
         before :each do
           expect(Sale).to receive(:find_secure).with("2", hashed_password).and_raise(ActiveRecord::RecordNotFound)
-          get :show, {:id => "2"}, {:password => "password"}
+          request.headers['password'] = "password"
+          get :show, {:id => "2"}
         end
         it_behaves_like "An error with status", 404
       end
       context "A different exception" do
         before :each do
           expect(Sale).to receive(:find_secure).with("2", hashed_password).and_raise(ActiveRecord::AdapterNotFound)
-          get :show, {:id => "2"}, {:password => "password"}
+          request.headers['password'] = "password"
+          get :show, {:id => "2"}
         end
         it_behaves_like "An error with status", 500
       end
@@ -88,7 +93,8 @@ RSpec.describe SalesController, :type => :controller do
       before :each do
         expect(Sale).to receive(:find_secure).with("1", hashed_password).and_return mock_sale
         expect(mock_sale).to receive(:destroy).and_return mock_sale
-        delete :destroy, {:id => 1}, {:password => "password"}
+        request.headers['password'] = "password"
+        delete :destroy, {:id => 1}
       end
       it_behaves_like "A collection of sales resources"
     end
@@ -96,14 +102,16 @@ RSpec.describe SalesController, :type => :controller do
       context "Record not found" do
         before :each do
           expect(Sale).to receive(:find_secure).with("2", hashed_password).and_raise(ActiveRecord::RecordNotFound)
-          delete :destroy, {:id => "2"}, {:password => "password"}
+          request.headers['password'] = "password"
+          delete :destroy, {:id => "2"}
         end
         it_behaves_like "An error with status", 404
       end
       context "Any other exception" do
         before :each do
           expect(Sale).to receive(:find_secure).with("2", hashed_password).and_raise(ActiveRecord::AdapterNotFound)
-          delete :destroy, {:id => "2"}, {:password => "password"}
+          request.headers['password'] = "password"
+          delete :destroy, {:id => "2"}
         end
         it_behaves_like "An error with status", 500
       end
