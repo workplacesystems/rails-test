@@ -9,10 +9,10 @@ class SalesController < ApplicationController
 
   end
   def show
-    @sales = [Sale.find(params[:id])]
+    @sales = [Sale.find_secure(params[:id], digested_password)]
   end
   def destroy
-    @sales = [Sale.find(params[:id]).destroy]
+    @sales = [Sale.find_secure(params[:id], digested_password).destroy]
     render :show
 
   end

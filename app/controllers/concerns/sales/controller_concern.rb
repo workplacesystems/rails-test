@@ -4,7 +4,7 @@ module Sales
 
     private
     def safe_params
-      converted_params.permit(:sales => [:date, :code, :value])
+      converted_params.permit(:sales => [:date, :code, :value, :hashed_password])
     end
     #Converts from the params given to us by the UI to the params that the model expects
     #To allow for future parameters to be added, I am simply merging the date in here (which is the date and time added together) and removing the time field.
@@ -14,9 +14,12 @@ module Sales
       my_params = params.clone  #Lets not modify the original
       my_params[:sales] = [params[:sales]] unless params[:sales].is_a?(Array)
       my_params[:sales].each do |sale|
-        sale.merge!(:date => sale[:date] + sale.delete(:time))
+        sale.merge!(:date => sale[:date] + sale.delete(:time), :hashed_password => digested_password)
       end
       my_params
+    end
+    def digested_password
+      Digest::MD5.hexdigest request.headers['password']
     end
   end
 end
