@@ -22,6 +22,15 @@ RSpec.describe SalesController, :type => :controller do
       expect(response).to render_template(:show)
     end
   end
+  shared_examples "An error with status" do |status|
+    it "Should respond with an error status of #{status}" do
+      expect(assigns(:sales)).to eq([])
+      expect(assigns(:exception)).to be_an Exception
+      expect(response.status).to eq(status)
+      expect(response).to render_template(:error)
+    end
+
+  end
   context "Create" do
     let(:sale_1) {{:date => '20140103', :time => '0700', :code => "FL", :value => '2.00'}}
     let(:sale_2) {{:date => '20140103', :time => '0815', :code => "DO", :value => '1.00'}}
@@ -43,20 +52,61 @@ RSpec.describe SalesController, :type => :controller do
     end
   end
   context "Show" do
-    let(:mock_sale) {double('Sale', :date => Time.parse('3 January 2014 07:00:00'), :code => 'FL', :value => 2.0)}
-    before :each do
-      expect(Sale).to receive(:find).and_return mock_sale
+    context "With positive response" do
+      let(:mock_sale) {double('Sale', :date => Time.parse('3 January 2014 07:00:00'), :code => 'FL', :value => 2.0)}
+      before :each do
+        expect(Sale).to receive(:find).with("1").and_return mock_sale
+        get :show, :id => "1"
+      end
+      it_behaves_like "A collection of sales resources"
     end
-    it_behaves_like "A collection of sales resources"
+    #A negative response is to return an empty array in sales
+    #and a status of false in the JSON response.
+    #This would normally be agreed with the UI developer(s), but in this case I am making an assumption
+    #that the UI would not want to be parsing an HTML error page.
+    context "With negative response" do
+      context "Record not found" do
+        before :each do
+          expect(Sale).to receive(:find).with("2").and_raise(ActiveRecord::RecordNotFound)
+          get :show, :id => "2"
+        end
+        it_behaves_like "An error with status", 404
+      end
+      context "A different exception" do
+        before :each do
+          expect(Sale).to receive(:find).with("2").and_raise(ActiveRecord::AdapterNotFound)
+          get :show, :id => "2"
+        end
+        it_behaves_like "An error with status", 500
+      end
+    end
   end
   context "Delete" do
-    let(:mock_sale) {double('Sale', :date => Time.parse('3 January 2014 07:00:00'), :code => 'FL', :value => 2.0)}
-    before :each do
-      expect(Sale).to receive(:find).with("1").and_return mock_sale
-      expect(mock_sale).to receive(:destroy).and_return mock_sale
-      delete :destroy, :id => 1
+    context "With positive response" do
+      let(:mock_sale) {double('Sale', :date => Time.parse('3 January 2014 07:00:00'), :code => 'FL', :value => 2.0)}
+      before :each do
+        expect(Sale).to receive(:find).with("1").and_return mock_sale
+        expect(mock_sale).to receive(:destroy).and_return mock_sale
+        delete :destroy, :id => 1
+      end
+      it_behaves_like "A collection of sales resources"
     end
-    it_behaves_like "A collection of sales resources"
+    context "With negative response" do
+      context "Record not found" do
+        before :each do
+          expect(Sale).to receive(:find).with("2").and_raise(ActiveRecord::RecordNotFound)
+          delete :destroy, :id => "2"
+        end
+        it_behaves_like "An error with status", 404
+      end
+      context "Any other exception" do
+        before :each do
+          expect(Sale).to receive(:find).with("2").and_raise(ActiveRecord::AdapterNotFound)
+          delete :destroy, :id => "2"
+        end
+        it_behaves_like "An error with status", 500
+      end
+    end
   end
 
 
