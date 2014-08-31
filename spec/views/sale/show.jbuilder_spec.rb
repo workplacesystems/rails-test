@@ -11,7 +11,7 @@ describe "sales/show" do
     render
     decoded =ActiveSupport::JSON.decode(rendered).with_indifferent_access
     expect(decoded[:sales]).to be_an Array
-    expect(decoded[:sales][0]).to eq({'date' => '20130103', 'time' => '0700', 'code' => 'FL', 'value' => '2.00'})
-    expect(decoded[:sales][1]).to eq({'date' => '20130103', 'time' => '0815', 'code' => 'DO', 'value' => '1.00'})
+    expect(decoded[:sales][0]).to include({'date' => '20130103', 'time' => '0700', 'code' => 'FL', 'value' => '2.00', 'id' => a_string_matching(/^\d*$/)})
+    expect(decoded[:sales][1]).to include({'date' => '20130103', 'time' => '0815', 'code' => 'DO', 'value' => '1.00', 'id' => a_string_matching(/^\d*$/)})
   end
 end
