@@ -2,7 +2,9 @@ class SalesController < ApplicationController
   include Sales::ControllerConcern
   respond_to :json
   def create
-    @sale = Sale.create(safe_params[:sales])
+    @sales = Sale.create(safe_params[:sales])
+    @sales = [@sales] unless @sales.instance_of? Array
+    render :show
 
   end
   def show
