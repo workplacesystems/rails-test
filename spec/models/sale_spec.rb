@@ -25,6 +25,7 @@ RSpec.describe Sale, :type => :model do
     expect(result).to be_a Sale
   end
   context 'Finding a record using a simple method which finds by id and hashed_password' do
+    new_sale = nil
     before :each do
       new_sale = Sale.create! :date => Time.parse('1 January 2013 09:00:00'), :code => 'TEST', :value => 10.25, :hashed_password => Digest::MD5.hexdigest('password')
     end
@@ -35,7 +36,7 @@ RSpec.describe Sale, :type => :model do
     end
     context "Negative response" do
       it 'Should not find the record if the wrong password is given' do
-        expect(Sale.find_secure(new_sale.id, Digest::MD5.hexdigest('wrongpassword'))).to raise(ActiveRecord::RecordNotFound)
+        expect {Sale.find_secure(new_sale.id, Digest::MD5.hexdigest('wrongpassword'))}.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
   end
