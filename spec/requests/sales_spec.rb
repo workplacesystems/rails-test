@@ -1,6 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe "Sales rest endpoints", :type => :request do
+  let :example_sale_attributes do
+    {:date => Time.parse('1 November 2010 13:31:00'), :value => 1.50, :code => 'TEST', :hashed_password => Digest::MD5.hexdigest('password')}
+  end
+
   describe "POST /sales" do
     let :plural_json do
       {
@@ -17,8 +21,7 @@ RSpec.describe "Sales rest endpoints", :type => :request do
                   code: 'DO',
                   value: '1.00'
               }
-          ],
-          password: 'password'
+          ]
       }
     end
     let :singular_json do
@@ -28,16 +31,12 @@ RSpec.describe "Sales rest endpoints", :type => :request do
               time: '0700',
               code: 'FL',
               value: '2.00'
-          },
-          password: 'password'
+          }
       }
-    end
-    let :example_sale_attributes do
-      {:date => Time.parse('1 November 2010 13:31:00'), :value => 1.50, :code => 'TEST', :hashed_password => Digest::MD5.hexdigest('password')}
     end
 
     it "Should create a single sale" do
-      expect {post '/sales.json', singular_json}.to change(Sale, :count).by 1
+      expect {post '/sales.json', singular_json, {'password' => "password"}}.to change(Sale, :count).by 1
       expect(response.status).to be(200)
       response_data = ActiveSupport::JSON.decode(response.body).with_indifferent_access
       #Verify the response data.  It should have 'sales' as the root item and an array of items even if only 1.
@@ -50,7 +49,7 @@ RSpec.describe "Sales rest endpoints", :type => :request do
       expect(created_sale.code).to eq('FL')
     end
     it 'Should create multiple sales' do
-      expect {post '/sales.json', plural_json}.to change(Sale, :count).by 2
+      expect {post '/sales.json', plural_json, {'password' => "password"}}.to change(Sale, :count).by 2
       expect(response.status).to be(200)
       response_data = HashWithIndifferentAccess.new HashWithIndifferentAccess.new ActiveSupport::JSON.decode(response.body)
       #Verify the response data.  It should have 'sales' as the root item and an array of items.
@@ -64,27 +63,33 @@ RSpec.describe "Sales rest endpoints", :type => :request do
       expect(second_created_sale.value).to eq(1.0)
       expect(second_created_sale.code).to eq('DO')
     end
+
+  end
+  describe "GET /sales/:id" do
     it 'Should read a specific sale if the password is correct' do
       sale = Sale.create example_sale_attributes
-      get "/sales/#{sale.id}.json", :password => "password"
+      get "/sales/#{sale.id}.json", nil, {'password' => "password"}
       expect(response.status).to be(200)
       expect(ActiveSupport::JSON.decode(response.body).with_indifferent_access).to include({:sales => [{:date => '20101101', :time => '1331', :code => 'TEST', :value => '1.50', :id => a_string_matching(/^\d+$/)}]})
     end
     it 'Should not read a specific sale if the password is wrong' do
       sale = Sale.create example_sale_attributes
-      get "/sales/#{sale.id}.json", :password => "wrongpassword"
+      get "/sales/#{sale.id}.json", nil, {'password' => "password"}
       expect(response.status).to be(404)
       expect(ActiveSupport::JSON.decode(response.body).with_indifferent_access).to include({:sales => [], :exception => {:message => "Record not found"}})
     end
+
+  end
+  describe "DELETE /sales/:id" do
     it 'Should delete a specific sale if the password is correct' do
       sale = Sale.create example_sale_attributes
-      expect {delete "/sales/#{sale.id}.json"}.to change(Sale, :count).by -1
+      expect {delete "/sales/#{sale.id}.json", nil, {'password' => "password"}}.to change(Sale, :count).by -1
       expect(response.status).to be(200)
       expect(Sale.where(:id => sale.id).count).to eq(0)
     end
     it 'Should not delete a specific sale if the password is wrong' do
       sale = Sale.create example_sale_attributes
-      expect {delete "/sales/#{sale.id}.json", :password => "wrongpassword"}.to change(Sale, :count).by 0
+      expect {delete "/sales/#{sale.id}.json", nil, :password => "wrongpassword"}.to change(Sale, :count).by 0
       expect(response.status).to be(404)
       expect(Sale.where(:id => sale.id).count).to eq(1)
     end
