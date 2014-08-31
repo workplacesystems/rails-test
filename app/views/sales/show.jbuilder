@@ -1,8 +1,8 @@
 json.sales do
   json.array! @sales do |sale|
-    json.date sale.date.strftime('ymd')
-    json.time sale.date.strftime('hm')
+    json.date sale.date.strftime('%Y%m%d')
+    json.time sale.date.strftime('%H%M')
     json.code sale.code
-    json.value sale.value.to_s
+    json.value number_with_precision sale.value, :precision => 2
   end
 end
