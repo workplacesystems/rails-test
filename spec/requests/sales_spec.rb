@@ -37,7 +37,7 @@ RSpec.describe "Sales rest endpoints", :type => :request do
     it "Should create a single sale" do
       expect {post '/sales.json', singular_json}.to change(Sale, :count).by 1
       expect(response.status).to be(200)
-      response_data = ActiveSupport::JSON.decode(response.body)
+      response_data = HashWithIndifferentAccess.new ActiveSupport::JSON.decode(response.body)
       #Verify the response data.  It should have 'sales' as the root item and an array of items even if only 1.
       # This was decided upon to make the user interface code simpler and would normally have been decided
       # with the UI developer(s) if it wasnt specified in the requirements.
@@ -50,7 +50,7 @@ RSpec.describe "Sales rest endpoints", :type => :request do
     it 'Should create multiple sales' do
       expect {post '/sales.json', plural_json}.to change(Sale, :count).by 2
       expect(response.status).to be(200)
-      response_data = ActiveSupport::JSON.decode(response.body)
+      response_data = HashWithIndifferentAccess.new HashWithIndifferentAccess.new ActiveSupport::JSON.decode(response.body)
       #Verify the response data.  It should have 'sales' as the root item and an array of items.
       expect(response_data[:sales].length).to eq(2)
       first_created_sale = Sale.find(response_data[:sales].first[:id])
@@ -66,7 +66,7 @@ RSpec.describe "Sales rest endpoints", :type => :request do
       sale = Sale.create example_sale_attributes
       get "/sales/#{sale.id}.json"
       expect(response.status).to be(200)
-      expect(ActiveSupport::JSON.decode(response.body)).to eq({:sales => [{:date => '20101101', :time => '1331', :code => 'TEST', :value => '1.50'}]})
+      expect(HashWithIndifferentAccess.new ActiveSupport::JSON.decode(response.body)).to eq({:sales => [{:date => '20101101', :time => '1331', :code => 'TEST', :value => '1.50'}]})
     end
     it 'Should delete a specific sale' do
       sale = Sale.create example_sale_attributes

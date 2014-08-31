@@ -9,9 +9,9 @@ describe "sales/show" do
         Sale.create!(sale_2),
     ])
     render
-    decoded =HashWithIndifferentAccess.new ActiveSupport::JSON.decode(rendered)
+    decoded =ActiveSupport::JSON.decode(rendered).with_indifferent_access
     expect(decoded[:sales]).to be_an Array
-    expect(decoded[:sales][0]).to eq({:date => '20130103', :time => '0700', :code => 'FL', :value => '2.00'})
-    expect(decoded[:sales][1]).to eq({:date => '20130103', :time => '0815', :code => 'DO', :value => '1.00'})
+    expect(decoded[:sales][0]).to eq({'date' => '20130103', 'time' => '0700', 'code' => 'FL', 'value' => '2.00'})
+    expect(decoded[:sales][1]).to eq({'date' => '20130103', 'time' => '0815', 'code' => 'DO', 'value' => '1.00'})
   end
 end
