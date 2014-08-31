@@ -78,6 +78,12 @@ RSpec.describe "Sales rest endpoints", :type => :request do
       expect(response.status).to be(404)
       expect(ActiveSupport::JSON.decode(response.body).with_indifferent_access).to include({:sales => [], :exception => {:message => "Record not found"}})
     end
+    it 'Should not read a specific sale if the password is missing' do
+      sale = Sale.create example_sale_attributes
+      get "/sales/#{sale.id}.json"
+      expect(response.status).to be(404)
+      expect(ActiveSupport::JSON.decode(response.body).with_indifferent_access).to include({:sales => [], :exception => {:message => "Record not found"}})
+    end
 
   end
   describe "DELETE /sales/:id" do

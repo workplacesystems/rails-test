@@ -77,6 +77,13 @@ RSpec.describe SalesController, :type => :controller do
         end
         it_behaves_like "An error with status", 404
       end
+      context "Missing password" do
+        before :each do
+          expect(Sale).to receive(:find_secure).with("2", nil).and_raise(ActiveRecord::RecordNotFound)
+          get :show, {:id => "2"}
+        end
+        it_behaves_like "An error with status", 404
+      end
       context "A different exception" do
         before :each do
           expect(Sale).to receive(:find_secure).with("2", hashed_password).and_raise(ActiveRecord::AdapterNotFound)
@@ -103,6 +110,13 @@ RSpec.describe SalesController, :type => :controller do
         before :each do
           expect(Sale).to receive(:find_secure).with("2", hashed_password).and_raise(ActiveRecord::RecordNotFound)
           request.headers['password'] = "password"
+          delete :destroy, {:id => "2"}
+        end
+        it_behaves_like "An error with status", 404
+      end
+      context "Missing password" do
+        before :each do
+          expect(Sale).to receive(:find_secure).with("2", nil).and_raise(ActiveRecord::RecordNotFound)
           delete :destroy, {:id => "2"}
         end
         it_behaves_like "An error with status", 404
