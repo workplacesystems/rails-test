@@ -19,7 +19,7 @@ module Sales
       my_params
     end
     def digested_password
-      Digest::MD5.hexdigest request.headers['password']
+      request.headers.key?('password') ? Digest::MD5.hexdigest(request.headers['password']) : nil
     end
   end
 end

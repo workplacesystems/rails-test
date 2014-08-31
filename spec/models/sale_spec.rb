@@ -40,5 +40,14 @@ RSpec.describe Sale, :type => :model do
       end
     end
   end
+  context 'Finding a record using find_secure with a nil hashed_password' do
+    new_sale = nil
+    before :each do
+      new_sale = Sale.create! :date => Time.parse('1 January 2013 09:00:00'), :code => 'TEST', :value => 10.25
+    end
+    it 'Should not find the record if the password is nil' do
+      expect {Sale.find_secure(new_sale.id, nil)}.to raise_error(ActiveRecord::RecordNotFound)
+    end
+  end
 
 end
