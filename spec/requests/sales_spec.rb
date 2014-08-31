@@ -17,7 +17,8 @@ RSpec.describe "Sales rest endpoints", :type => :request do
                   code: 'DO',
                   value: '1.00'
               }
-          ]
+          ],
+          password: 'password'
       }
     end
     let :singular_json do
@@ -27,11 +28,12 @@ RSpec.describe "Sales rest endpoints", :type => :request do
               time: '0700',
               code: 'FL',
               value: '2.00'
-          }
+          },
+          password: 'password'
       }
     end
     let :example_sale_attributes do
-      {:date => Time.parse('1 November 2010 13:31:00'), :value => 1.50, :code => 'TEST'}
+      {:date => Time.parse('1 November 2010 13:31:00'), :value => 1.50, :code => 'TEST', :hashed_password => Digest::MD5.hexdigest('password')}
     end
 
     it "Should create a single sale" do
@@ -62,17 +64,29 @@ RSpec.describe "Sales rest endpoints", :type => :request do
       expect(second_created_sale.value).to eq(1.0)
       expect(second_created_sale.code).to eq('DO')
     end
-    it 'Should read a specific sale' do
+    it 'Should read a specific sale if the password is correct' do
       sale = Sale.create example_sale_attributes
-      get "/sales/#{sale.id}.json"
+      get "/sales/#{sale.id}.json", :password => "password"
       expect(response.status).to be(200)
       expect(ActiveSupport::JSON.decode(response.body).with_indifferent_access).to include({:sales => [{:date => '20101101', :time => '1331', :code => 'TEST', :value => '1.50', :id => a_string_matching(/^\d+$/)}]})
     end
-    it 'Should delete a specific sale' do
+    it 'Should not read a specific sale if the password is wrong' do
+      sale = Sale.create example_sale_attributes
+      get "/sales/#{sale.id}.json", :password => "wrongpassword"
+      expect(response.status).to be(404)
+      expect(ActiveSupport::JSON.decode(response.body).with_indifferent_access).to include({:sales => [], :exception => {:message => "Record not found"}})
+    end
+    it 'Should delete a specific sale if the password is correct' do
       sale = Sale.create example_sale_attributes
       expect {delete "/sales/#{sale.id}.json"}.to change(Sale, :count).by -1
       expect(response.status).to be(200)
       expect(Sale.where(:id => sale.id).count).to eq(0)
+    end
+    it 'Should not delete a specific sale if the password is wrong' do
+      sale = Sale.create example_sale_attributes
+      expect {delete "/sales/#{sale.id}.json", :password => "wrongpassword"}.to change(Sale, :count).by 0
+      expect(response.status).to be(404)
+      expect(Sale.where(:id => sale.id).count).to eq(1)
     end
 
   end
