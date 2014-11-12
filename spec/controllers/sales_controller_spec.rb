@@ -3,53 +3,58 @@ describe SalesController do
 
   context 'sending a POST request' do
     describe '#create' do
-      subject { post :create, params }
+      before do
+        controller.load_create_sale_service(fake_service)
+      end
+      let(:fake_service) { double }
+      let(:expected_sale) { build :sale }
+
+      let(:sale_data) do
+        { date: '20140103',
+          time: '0815',
+          code: 'DO',
+          value: '1.00' }
+      end
 
       context 'multiple sales' do
         let(:params) do
-          { format: :json,
-            sales: [ { date: '20140103',
-                       time: '0700',
-                       code: 'FL',
-                       value: '2.00' },
-                     { date: '20140103',
-                       time: '0815',
-                       code: 'DO',
-                       value: '1.00' } ] }
+          { format: :json, sales: [ sale_data, sale_data_2 ] }
+        end
+        let(:sale_data_2) do
+          { date: '20140104' }
         end
 
-        it 'creates multiple records' do
-          expect { subject }.to change(Sale, :count).by(2)
-        end
-
-        it 'responds correctly and includes id with an access password' do
-          subject
-          expect(response).to be_success
-          expect(json.count).to eq 2
-          expect(json.first['id']).to be_an Integer
+        it 'calls the service with parsed data' do
+          expect(fake_service).to receive(:create_multiple).with([sale_data, sale_data_2]).once
+          post :create, params
         end
       end
 
       context 'singular sale' do
         let(:params) do
-          { format: :json,
-            sale: { date: '20140103',
-                    time: '0700',
-                    code: 'FL',
-                    value: '3.00' } }
+          { format: :json, sale: sale_data }
         end
-        it 'does not except html' do
-          expect { get :create, params.merge(format: :html) }.to raise_error(ActionController::UnknownFormat )
+
+        it 'calls the service with parsed data' do
+          expect(fake_service).to receive(:create_multiple).with([sale_data]).once
+          post :create, params
         end
-        it 'creates a single record' do
-          expect { subject }.to change(Sale, :count).by(1)
-        end
-        it 'responds correctly and includes id with an access password' do
-          subject
-          expect(response).to be_success
-          expect(json).to include('id')
-          #expect(json).to include('password')
-        end
+      end
+    end
+  end
+
+  context 'sending a GET request' do
+    describe '#show' do
+      before do
+        controller.load_retrieve_sale_service(fake_service)
+      end
+      let(:fake_service) { double }
+      let(:expected_sale) { build :sale }
+
+      it 'passes id and password to retrieve service' do
+        expect(fake_service).to receive(:load).with('123', 'pass').and_return(expected_sale)
+        get :show, { format: :json, id: 123, password: 'pass' }
+        expect(json['code']).to eq 'ABC123'
       end
     end
   end
@@ -58,32 +63,6 @@ describe SalesController do
 
     let(:sale1) { create :sale }
     before { sale1 }
-
-    context 'sending a GET request' do
-      describe '#show' do
-
-        context 'with correct password' do
-          let(:params) { { format: :json, id: sale1.id, password: sale1.generated_password } }
-          it 'allows access' do
-            get :show, params
-            expect(response).to be_success
-            expect(json['id']).to eq sale1.id
-            expect(json).to include('date','time','code','value')
-          end
-          it 'does not except html' do
-            expect { get :show, params.merge(format: :html) }.to raise_error(ActionController::UnknownFormat )
-          end
-        end
-
-        context 'with incorrect password' do
-          let(:params) { { format: :json, id: sale1.id, password: 'dontletmein' } }
-          it 'denies access' do
-            get :show, params
-            expect(response).not_to be_success
-          end
-        end
-      end
-    end
 
     context 'sending a DELETE request' do
       describe '#destroy' do
@@ -95,5 +74,4 @@ describe SalesController do
       end
     end
   end
-
 end

@@ -1,7 +1,7 @@
 require 'rails_helper'
 describe RetrieveSaleService do
 
-  describe '::load' do
+  describe '#load' do
 
     subject { described_class.new.load(id, password) }
 

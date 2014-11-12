@@ -1,9 +1,22 @@
 require 'rails_helper'
 describe CreateSaleService do
 
+  let(:service) { described_class.new }
+
+  describe '#create_multiple' do
+    subject { service.create_multiple(list) }
+
+    let(:list) { [ {}, {} ] }
+
+    it 'passes each item to #create' do
+      expect(service).to receive(:create).twice
+      subject
+    end
+  end
+
   describe '#create' do
 
-    subject { described_class.new.create(data) }
+    subject { service.create(data) }
 
     let(:data) { {} }
 
