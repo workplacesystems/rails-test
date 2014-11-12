@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe Sale do
 
   context 'the colum names' do
@@ -11,9 +9,15 @@ describe Sale do
     it { include :password_hash }
   end
 
-  it 'applys random 8 character password and hashes it' do
+  it 'generates an 8 character password and hash' do
     sale = Sale.new
-    expect( length(sale.password) ).to > 10
-    expect( length(sale.password_hash) ).to > 10
+    expect( sale.generated_password.length ).to eq 8
+    expect( sale.password_hash ).to be_an String
   end
+  
+  it 'the generated password can be validated' do
+    sale = Sale.new
+    expect(sale.password == sale.generated_password).to eq true
+  end
+  
 end
