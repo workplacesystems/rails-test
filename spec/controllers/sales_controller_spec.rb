@@ -25,8 +25,12 @@ describe SalesController do
         end
 
         it 'calls the service with parsed data' do
-          expect(fake_service).to receive(:create_multiple).with([sale_data, sale_data_2]).once
+          faked_data = [{"id"=>123, "password"=>"pass1"}, {"id"=>321, "password"=>"pass2"}]
+          expect(fake_service).to receive(:create_multiple).
+                                  with([sale_data, sale_data_2]).
+                                  once.and_return(faked_data)
           post :create, params
+          expect(json).to eq faked_data
         end
       end
 
@@ -54,7 +58,7 @@ describe SalesController do
       it 'passes id and password to retrieve service' do
         expect(fake_service).to receive(:load).with('123', 'pass').and_return(expected_sale)
         get :show, { format: :json, id: 123, password: 'pass' }
-        expect(json['code']).to eq 'ABC123'
+        expect(json).to include('code', 'date', 'id', 'time', 'value')
       end
     end
   end

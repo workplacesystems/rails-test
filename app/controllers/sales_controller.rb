@@ -7,7 +7,9 @@ class SalesController < ApplicationController
 
   def show
     sale = @retrieve_sale_service.load(params[:id], params[:password])
-    respond_with(sale)
+    respond_to do |format|
+      format.json { render json: sale, except: [:password_hash, :updated_at, :created_at] }
+    end
   end
 
   def create
