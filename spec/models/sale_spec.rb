@@ -1,3 +1,4 @@
+require 'rails_helper'
 describe Sale do
 
   context 'the colum names' do
