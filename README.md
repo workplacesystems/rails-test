@@ -1,7 +1,5 @@
 # Rails Test
 
-[![Build Status](https://travis-ci.org/nickpellant/rails-test.svg?branch=master)](https://travis-ci.org/nickpellant/rails-test) [![Coverage Status](https://img.shields.io/coveralls/nickpellant/rails-test.svg)](https://coveralls.io/r/nickpellant/rails-test) [![Code Climate](https://codeclimate.com/github/nickpellant/rails-test.png)](https://codeclimate.com/github/nickpellant/rails-test)
-
 This Rails application is a foundation for the following Ruby on Rails technical test. To start the test please fork this repository and follow the instructions below.
 
 ## Tasks
@@ -46,10 +44,6 @@ You should not spend more than **4 hours** on this test. We measure time spent d
 ### Testing
 
 We use [RSpec](https://relishapp.com/rspec) and follow an outside-in testing approach. Approach testing your work in the same way you would during your day-to-day development as we use tests as a marker for code quality.
-
-### Quality Indicators
-
-Please make use of quality indicators such as [CodeClimate](http://codeclimate.com), [Travis CI](travis-ci.com) and [Coveralls](https://coveralls.io). Update the provided badges in your `README.md` when setting up.
 
 ### Commit History
 
